@@ -1,16 +1,16 @@
 #!/bin/bash
 
-VPSTARBALLURL=$(curl -s https://api.github.com/repos/bulwark-crypto/bulwark/releases/latest | grep browser_download_url | grep linux64 | cut -d '"' -f 4)
-VPSTARBALLNAME=$(curl -s https://api.github.com/repos/bulwark-crypto/bulwark/releases/latest | grep browser_download_url | grep linux64 | cut -d '"' -f 4 | cut -d "/" -f 9)
-SHNTARBALLURL=$(curl -s https://api.github.com/repos/bulwark-crypto/bulwark/releases/latest | grep browser_download_url | grep ARM | cut -d '"' -f 4)
-SHNTARBALLNAME=$(curl -s https://api.github.com/repos/bulwark-crypto/bulwark/releases/latest | grep browser_download_url | grep ARM | cut -d '"' -f 4 | cut -d "/" -f 9)
-BWKVERSION=$(curl -s https://api.github.com/repos/bulwark-crypto/bulwark/releases/latest | grep browser_download_url | grep ARM | cut -d '"' -f 4 | cut -d "/" -f 8)
+VPSTARBALLURL=$(curl -s https://api.github.com/repos/vulcanocrypto/vulcano/releases/latest | grep browser_download_url | grep linux64 | cut -d '"' -f 4)
+VPSTARBALLNAME=$(curl -s https://api.github.com/repos/vulcanocrypto/vulcano/releases/latest | grep browser_download_url | grep linux64 | cut -d '"' -f 4 | cut -d "/" -f 9)
+SHNTARBALLURL=$(curl -s https://api.github.com/repos/vulcanocrypto/vulcano/releases/latest | grep browser_download_url | grep ARM | cut -d '"' -f 4)
+SHNTARBALLNAME=$(curl -s https://api.github.com/repos/vulcanocrypto/vulcano/releases/latest | grep browser_download_url | grep ARM | cut -d '"' -f 4 | cut -d "/" -f 9)
+VULCVERSION=$(curl -s https://api.github.com/repos/vulcanocrypto/vulcano/releases/latest | grep browser_download_url | grep ARM | cut -d '"' -f 4 | cut -d "/" -f 8)
 
 CHARS="/-\\|"
 
 
 clear
-echo "This script will update your wallet to version $BWKVERSION"
+echo "This script will update your wallet to version $VULCVERSION"
 read -rp "Press Ctrl-C to abort or any other key to continue. " -n1 -s
 clear
 
@@ -19,42 +19,42 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-USER="bulwark"
-USERHOME="/home/bulwark"
+USER="vulcano"
+USERHOME="/home/vulcano"
 
 echo "Shutting down wallet..."
-if [ -e /etc/systemd/system/bulwarkd.service ]; then
-  systemctl stop bulwarkd
+if [ -e /etc/systemd/system/vulcanod.service ]; then
+  systemctl stop vulcanod
 else
-  su -c "bulwark-cli stop" "bulwark"
+  su -c "vulcano-cli stop" "vulcano"
 fi
 
 if grep -q "ARMv7" /proc/cpuinfo; then
-  # Install Bulwark daemon for ARMv7 systems
+  # Install Vulcano daemon for ARMv7 systems
   wget "$SHNTARBALLURL"
-  tar -xzvf "$SHNTARBALLNAME" && mv bin "bulwark-$BWKVERSION"
+  tar -xzvf "$SHNTARBALLNAME" && mv bin "vulcano-$VULCVERSION"
   rm" $SHNTARBALLNAME"
-  cp "./bulwark-$BWKVERSION/bulwarkd" /usr/local/bin
-  cp "./bulwark-$BWKVERSION/bulwark-cli" /usr/local/bin
-  cp "./bulwark-$BWKVERSION/bulwark-tx" /usr/local/bin
-  rm -rf "bulwark-$BWKVERSION"
+  cp "./vulcano-$VULCVERSION/vulcanod" /usr/local/bin
+  cp "./vulcano-$VULCVERSION/vulcano-cli" /usr/local/bin
+  cp "./vulcano-$VULCVERSION/vulcano-tx" /usr/local/bin
+  rm -rf "vulcano-$VULCVERSION"
 else
-  # Install Bulwark daemon for x86 systems
+  # Install Vulcano daemon for x86 systems
   wget "$VPSTARBALLURL"
-  tar -xzvf "$VPSTARBALLNAME" && mv bin "bulwark-$BWKVERSION"
+  tar -xzvf "$VPSTARBALLNAME" && mv bin "vulcano-$VULCVERSION"
   rm "$VPSTARBALLNAME"
-  cp "./bulwark-$BWKVERSION/bulwarkd" /usr/local/bin
-  cp "./bulwark-$BWKVERSION/bulwark-cli" /usr/local/bin
-  cp "./bulwark-$BWKVERSION/bulwark-tx" /usr/local/bin
-  rm -rf "bulwark-$BWKVERSION"
+  cp "./vulcano-$VULCVERSION/vulcanod" /usr/local/bin
+  cp "./vulcano-$VULCVERSION/vulcano-cli" /usr/local/bin
+  cp "./vulcano-$VULCVERSION/vulcano-tx" /usr/local/bin
+  rm -rf "vulcano-$VULCVERSION"
 fi
 
-if [ -e /usr/bin/bulwarkd ];then rm -rf /usr/bin/bulwarkd; fi
-if [ -e /usr/bin/bulwark-cli ];then rm -rf /usr/bin/bulwark-cli; fi
-if [ -e /usr/bin/bulwark-tx ];then rm -rf /usr/bin/bulwark-tx; fi
+if [ -e /usr/bin/vulcanod ];then rm -rf /usr/bin/vulcanod; fi
+if [ -e /usr/bin/vulcano-cli ];then rm -rf /usr/bin/vulcano-cli; fi
+if [ -e /usr/bin/vulcano-tx ];then rm -rf /usr/bin/vulcano-tx; fi
 
-# Remove addnodes from bulwark.conf
-sed -i '/^addnode/d' "/home/bulwark/.bulwark/bulwark.conf"
+# Remove addnodes from vulcano.conf
+sed -i '/^addnode/d' "/home/vulcano/.vulcanocore/vulcano.conf"
 
 # Add Fail2Ban memory hack if needed
 if ! grep -q "ulimit -s 256" /etc/default/fail2ban; then
@@ -62,22 +62,22 @@ if ! grep -q "ulimit -s 256" /etc/default/fail2ban; then
   systemctl restart fail2ban
 fi
 
-echo "Restarting Bulwark daemon..."
-if [ -e /etc/systemd/system/bulwarkd.service ]; then
-  systemctl disable bulwarkd
-  rm /etc/systemd/system/bulwarkd.service
+echo "Restarting Vulcano daemon..."
+if [ -e /etc/systemd/system/vulcanod.service ]; then
+  systemctl disable vulcanod
+  rm /etc/systemd/system/vulcanod.service
 fi
 
-cat > /etc/systemd/system/bulwarkd.service << EOL
+cat > /etc/systemd/system/vulcanod.service << EOL
 [Unit]
-Description=Bulwarks's distributed currency daemon
+Description=Vulcanos's distributed currency daemon
 After=network.target
 [Service]
 Type=forking
 User=${USER}
 WorkingDirectory=${USERHOME}
-ExecStart=/usr/local/bin/bulwarkd -conf=${USERHOME}/.bulwark/bulwark.conf -datadir=${USERHOME}/.bulwark
-ExecStop=/usr/local/bin/bulwark-cli -conf=${USERHOME}/.bulwark/bulwark.conf -datadir=${USERHOME}/.bulwark stop
+ExecStart=/usr/local/bin/vulcanod -conf=${USERHOME}/.vulcanocore/vulcano.conf -datadir=${USERHOME}/.vulcanocore
+ExecStop=/usr/local/bin/vulcano-cli -conf=${USERHOME}/.vulcanocore/vulcano.conf -datadir=${USERHOME}/.vulcanocore stop
 Restart=on-failure
 RestartSec=1m
 StartLimitIntervalSec=5m
@@ -86,10 +86,10 @@ StartLimitBurst=3
 [Install]
 WantedBy=multi-user.target
 EOL
-sudo systemctl enable bulwarkd
-sudo systemctl start bulwarkd
+sudo systemctl enable vulcanod
+sudo systemctl start vulcanod
 
-until [ -n "$(bulwark-cli getconnectioncount 2>/dev/null)"  ]; do
+until [ -n "$(vulcano-cli getconnectioncount 2>/dev/null)"  ]; do
   sleep 1
 done
 
@@ -97,7 +97,7 @@ clear
 
 echo "Your wallet is syncing. Please wait for this process to finish."
 
-until su -c "bulwark-cli mnsync status 2>/dev/null | grep '\"IsBlockchainSynced\" : true' > /dev/null" "bulwark"; do
+until su -c "vulcano-cli mnsync status 2>/dev/null | grep '\"IsBlockchainSynced\" : true' > /dev/null" "vulcano"; do
   for (( i=0; i<${#CHARS}; i++ )); do
     sleep 2
     echo -en "${CHARS:$i:1}" "\\r"
@@ -106,4 +106,4 @@ done
 
 clear
 
-echo "Bulwark is now up to date. Do not forget to unlock your wallet!"
+echo "Vulcano is now up to date. Do not forget to unlock your wallet!"
