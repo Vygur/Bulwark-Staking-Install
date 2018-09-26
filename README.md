@@ -14,7 +14,7 @@ If you do not expressly follow the script and the associated instructions, there
 
 Due to the higher security needs of a staking server (compared to a masternode), this script is **FOR ADVANCED USERS ONLY**. Please read the entire guide before you proceed.
 
-This script will try to create a safe environment for remote staking by hardening the remote server you stake on. It will also help you with choosing a good user password. In total, you will set up two different passwords:
+This script will attempt to create a safe environment for remote staking by hardening the remote server you stake on. It will also help you with choosing a good user password. In total, you will set up two different passwords:
 
 1. An account password for the user you log in with
 2. A wallet password for your Vulcano staking wallet
